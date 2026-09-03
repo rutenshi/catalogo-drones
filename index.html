@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo Interactivo de Equipos - FAMAQ</title>
+  <title>Catálogo Interactivo de Equipos y Refacciones - FAMAQ</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -24,57 +24,102 @@
     <!-- Catálogo de Productos -->
     <section class="catalogo-grid">
       
-      <!-- Tarjeta T100 -->
-      <div class="tarjeta-producto" onclick="seleccionarProducto('T100', 'DJI Agras T100', 'https://via.placeholder.com/300x200?text=DJI+T100')">
+      <!-- DRONES -->
+      <div class="tarjeta-producto" onclick="seleccionarProducto('T100', 'DJI Agras T100', 'dron', 'https://via.placeholder.com/300x200?text=DJI+T100')">
         <img src="https://via.placeholder.com/300x200?text=DJI+T100" alt="DJI T100">
         <h3>DJI Agras T100</h3>
         <p>Capacidad de carga ultra pesada para alta productividad.</p>
         <button class="btn-ver">Ver Detalles</button>
       </div>
 
-      <!-- Tarjeta T70P -->
-      <div class="tarjeta-producto" onclick="seleccionarProducto('T70P', 'DJI Agras T70P', 'https://via.placeholder.com/300x200?text=DJI+T70P')">
+      <div class="tarjeta-producto" onclick="seleccionarProducto('T70P', 'DJI Agras T70P', 'dron', 'https://via.placeholder.com/300x200?text=DJI+T70P')">
         <img src="https://via.placeholder.com/300x200?text=DJI+T70P" alt="DJI T70P">
         <h3>DJI Agras T70P</h3>
         <p>Rendimiento óptimo para frutales y grandes cultivos.</p>
         <button class="btn-ver">Ver Detalles</button>
       </div>
 
-      <!-- Tarjeta T25P -->
-      <div class="tarjeta-producto" onclick="seleccionarProducto('T25P', 'DJI Agras T25P', 'https://via.placeholder.com/300x200?text=DJI+T25P')">
+      <div class="tarjeta-producto" onclick="seleccionarProducto('T25P', 'DJI Agras T25P', 'dron', 'https://via.placeholder.com/300x200?text=DJI+T25P')">
         <img src="https://via.placeholder.com/300x200?text=DJI+T25P" alt="DJI T25P">
         <h3>DJI Agras T25P</h3>
         <p>Diseño compacto e ideal para operaciones individuales.</p>
         <button class="btn-ver">Ver Detalles</button>
       </div>
 
+      <!-- EQUIPOS INDIVIDUALES / ACCESORIOS -->
+      <div class="tarjeta-producto" onclick="seleccionarProducto('BAT-IND', 'Batería Inteligente', 'accesorio', 'https://via.placeholder.com/300x200?text=Bateria+Inteligente')">
+        <img src="https://via.placeholder.com/300x200?text=Bateria+Inteligente" alt="Batería Inteligente">
+        <h3>Batería Inteligente DB (Individual)</h3>
+        <p>Batería de alta capacidad para la serie Agras.</p>
+        <button class="btn-ver">Ver Detalles</button>
+      </div>
+
+      <div class="tarjeta-producto" onclick="seleccionarProducto('GEN-IND', 'Generador / Cargador C9000', 'accesorio', 'https://via.placeholder.com/300x200?text=Generador+C9000')">
+        <img src="https://via.placeholder.com/300x200?text=Generador+C9000" alt="Generador C9000">
+        <h3>Generador / Cargador EFI (Individual)</h3>
+        <p>Sistema de carga rápida para campo.</p>
+        <button class="btn-ver">Ver Detalles</button>
+      </div>
+
     </section>
 
-    <!-- Panel Lateral de Selección (Detalle del Producto) -->
+    <!-- Panel Lateral de Selección -->
     <aside class="panel-detalle" id="panel-detalle">
       <div class="detalle-header">
-        <h2 id="detalle-titulo">Selecciona un modelo</h2>
+        <h2 id="detalle-titulo">Selecciona un producto</h2>
       </div>
       
       <div class="detalle-body">
-        <img id="detalle-imagen" src="https://via.placeholder.com/300x200?text=Selecciona+un+Dron" alt="Vista previa">
+        <img id="detalle-imagen" src="https://via.placeholder.com/300x200?text=Selecciona+un+Producto" alt="Vista previa">
         
-        <div class="controles-pedido" id="controles-pedido" style="display:none;">
-          <label>CANTIDAD DE DRONES</label>
+        <!-- Opciones para Drones -->
+        <div class="controles-pedido" id="controles-dron" style="display:none;">
+          <label>CANTIDAD DE EQUIPOS</label>
           <div class="selector-cantidad">
-            <button onclick="ajustarCantidad(-1)">-</button>
+            <button onclick="ajustarDrones(-1)">-</button>
             <input type="number" id="cantidad-drones" value="1" readonly>
-            <button onclick="ajustarCantidad(1)">+</button>
+            <button onclick="ajustarDrones(1)">+</button>
           </div>
 
-          <div class="accesorios-sugeridos">
-            <h4>Accesorios Sugeridos (Auto):</h4>
-            <p>🔋 Baterías: <span id="sug-baterias">3</span></p>
-            <p>⚡ Generador: <span id="sug-generador">1</span></p>
+          <div class="configuracion-accesorios">
+            <h4>Configuración de Combos (Máximos Permitidos):</h4>
+            
+            <div class="control-accesorio">
+              <label>🔋 Baterías:</label>
+              <div class="selector-cantidad mini">
+                <button onclick="ajustarBaterias(-1)">-</button>
+                <input type="number" id="cantidad-baterias" value="3" readonly>
+                <button onclick="ajustarBaterias(1)">+</button>
+              </div>
+              <small class="texto-maximo">Sugerido: 3 | Máx: <span id="max-bat-label">6</span></small>
+            </div>
+
+            <div class="control-accesorio">
+              <label>⚡ Generadores:</label>
+              <div class="selector-cantidad mini">
+                <button onclick="ajustarGeneradores(-1)">-</button>
+                <input type="number" id="cantidad-generadores" value="1" readonly>
+                <button onclick="ajustarGeneradores(1)">+</button>
+              </div>
+              <small class="texto-maximo">Sugerido: 1 | Máx: <span id="max-gen-label">2</span></small>
+            </div>
           </div>
 
-          <button class="btn-agregar-carrito" onclick="agregarAlCarrito()">+ Agregar al Pedido</button>
+          <button class="btn-agregar-carrito" onclick="agregarDronAlCarrito()">+ Agregar Combo al Pedido</button>
         </div>
+
+        <!-- Opciones para Piezas Individuales -->
+        <div class="controles-pedido" id="controles-accesorio" style="display:none;">
+          <label>CANTIDAD DE PIEZAS</label>
+          <div class="selector-cantidad">
+            <button onclick="ajustarPiezaInd(-1)">-</button>
+            <input type="number" id="cantidad-piezas-ind" value="1" readonly>
+            <button onclick="ajustarPiezaInd(1)">+</button>
+          </div>
+
+          <button class="btn-agregar-carrito" onclick="agregarPiezaIndAlCarrito()">+ Agregar Piezas al Pedido</button>
+        </div>
+
       </div>
     </aside>
 
@@ -84,7 +129,7 @@
   <div id="modal-carrito" class="modal">
     <div class="modal-contenido">
       <span class="cerrar" onclick="cerrarModalCarrito()">&times;</span>
-      <h2>Resumen de Tu Pedido</h2>
+      <h2>Resumen del Pedido</h2>
       
       <div id="lista-carrito">
         <p>El pedido está vacío.</p>
@@ -92,7 +137,7 @@
 
       <div class="formulario-cliente">
         <label>Nombre del Distribuidor / Comercial:</label>
-        <input type="text" id="nombre-cliente" placeholder="Ej. Fulanito Perengano">
+        <input type="text" id="nombre-cliente" placeholder="Ej. FAMAQ Logistics">
         
         <button class="btn-enviar-pedido" onclick="enviarPedidoALark()">Enviar Pedido a Logística</button>
       </div>
