@@ -35,6 +35,13 @@
         <button class="btn-ver">Ver Detalles</button>
       </div>
 
+      <div class="tarjeta-producto" onclick="seleccionarProducto('T55', 'DJI Agras T55', 'https://via.placeholder.com/300x200?text=DJI+T55')">
+        <img src="https://via.placeholder.com/300x200?text=DJI+T55" alt="DJI T55">
+        <h3>DJI Agras T55</h3>
+        <p>Potencia versátil y máxima eficiencia agronómica.</p>
+        <button class="btn-ver">Ver Detalles</button>
+      </div>
+
       <div class="tarjeta-producto" onclick="seleccionarProducto('T25P', 'DJI Agras T25P', 'https://via.placeholder.com/300x200?text=DJI+T25P')">
         <img src="https://via.placeholder.com/300x200?text=DJI+T25P" alt="DJI T25P">
         <h3>DJI Agras T25P</h3>
@@ -61,7 +68,7 @@
           </div>
 
           <div class="configuracion-accesorios">
-            <h4>Configuración de Baterías y Cargadores:</h4>
+            <h4>Accesorios y Adicionales:</h4>
             
             <div class="control-accesorio">
               <label>🔋 Baterías:</label>
@@ -82,6 +89,27 @@
               </div>
               <small class="texto-maximo">Sugerido: 1 | Máx: <span id="max-gen-label">2</span> por equipo</small>
             </div>
+
+            <div class="control-accesorio">
+              <label>🌾 Tanque de Granulado:</label>
+              <div class="selector-cantidad mini">
+                <button onclick="ajustarGranulado(-1)">-</button>
+                <input type="number" id="cantidad-granulado" value="0" readonly>
+                <button onclick="ajustarGranulado(1)">+</button>
+              </div>
+              <small class="texto-maximo">Máx: <span id="max-gran-label">1</span> por equipo</small>
+            </div>
+
+            <div class="control-accesorio">
+              <label>💦 Kit de Boquillas:</label>
+              <div class="selector-cantidad mini">
+                <button onclick="ajustarBoquillas(-1)">-</button>
+                <input type="number" id="cantidad-boquillas" value="0" readonly>
+                <button onclick="ajustarBoquillas(1)">+</button>
+              </div>
+              <small class="texto-maximo">Máx: <span id="max-boq-label">1</span> por equipo</small>
+            </div>
+
           </div>
 
           <button class="btn-agregar-carrito" onclick="agregarDronAlCarrito()">+ Agregar Combo al Pedido</button>
