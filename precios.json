@@ -3,24 +3,24 @@
     "codigo": "T100",
     "nombre": "DJI Agras T100",
     "precio_mxn": 350000,
-    "imagen": "img/t100 ..png"
+    "imagen": "t100 ..png"
   },
   {
     "codigo": "T70P",
     "nombre": "DJI Agras T70P",
     "precio_mxn": 280000,
-    "imagen": "img/t70p.png"
+    "imagen": "t70p.png"
   },
   {
     "codigo": "T55",
     "nombre": "DJI Agras T55",
     "precio_mxn": 240000,
-    "imagen": "img/t55 solo.png"
+    "imagen": "t55 solo.png"
   },
   {
     "codigo": "T25P",
     "nombre": "DJI Agras T25P",
     "precio_mxn": 180000,
-    "imagen": "img/t25p.png"
+    "imagen": "t25p.png"
   }
 ]
