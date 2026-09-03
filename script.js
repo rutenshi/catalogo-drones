@@ -1,47 +1,128 @@
 let productoSeleccionado = null;
 let carrito = [];
 
-function seleccionarProducto(id, nombre, imagen) {
-  productoSeleccionado = { id, nombre, imagen };
+function seleccionarProducto(id, nombre, tipo, imagen) {
+  productoSeleccionado = { id, nombre, tipo, imagen };
   
   document.getElementById('detalle-titulo').innerText = nombre;
   document.getElementById('detalle-imagen').src = imagen;
-  document.getElementById('controles-pedido').style.display = 'block';
   
-  document.getElementById('cantidad-drones').value = 1;
-  actualizarSugerencias(1);
+  if (tipo === 'dron') {
+    document.getElementById('controles-dron').style.display = 'block';
+    document.getElementById('controles-accesorio').style.display = 'none';
+    
+    // Resetear a valores base
+    document.getElementById('cantidad-drones').value = 1;
+    actualizarLimitesAccesorios(1);
+  } else {
+    document.getElementById('controles-dron').style.display = 'none';
+    document.getElementById('controles-accesorio').style.display = 'block';
+    document.getElementById('cantidad-piezas-ind').value = 1;
+  }
 }
 
-function ajustarCantidad(delta) {
+// LÓGICA DE LÍMITES DE DRONES Y SUS COMBOS
+function actualizarLimitesAccesorios(numDrones) {
+  const maxBaterias = numDrones * 6; // Máximo 6 baterías por dron
+  const maxGeneradores = numDrones * 2; // Máximo 2 generadores por dron
+  
+  const sugBaterias = numDrones * 3; // Sugerencia base: 3
+  const sugGeneradores = numDrones * 1; // Sugerencia base: 1
+
+  document.getElementById('max-bat-label').innerText = maxBaterias;
+  document.getElementById('max-gen-label').innerText = maxGeneradores;
+
+  // Ajustar valores actuales si sobrepasan los nuevos límites
+  let inputBat = document.getElementById('cantidad-baterias');
+  let inputGen = document.getElementById('cantidad-generadores');
+
+  inputBat.value = sugBaterias;
+  inputGen.value = sugGeneradores;
+}
+
+function ajustarDrones(delta) {
   let input = document.getElementById('cantidad-drones');
   let valor = parseInt(input.value) + delta;
   if (valor < 1) valor = 1;
   input.value = valor;
-  actualizarSugerencias(valor);
+  
+  actualizarLimitesAccesorios(valor);
 }
 
-function actualizarSugerencias(cantidad) {
-  // Regla de negocio: 3 baterías y 1 generador por dron
-  document.getElementById('sug-baterias').innerText = cantidad * 3;
-  document.getElementById('sug-generador').innerText = cantidad * 1;
+function ajustarBaterias(delta) {
+  const numDrones = parseInt(document.getElementById('cantidad-drones').value);
+  const maxPermitido = numDrones * 6;
+  
+  let input = document.getElementById('cantidad-baterias');
+  let valor = parseInt(input.value) + delta;
+  
+  if (valor < 1) valor = 1;
+  if (valor > maxPermitido) {
+    alert(`El límite máximo permitido es de 6 baterías por dron (${maxPermitido} baterías para ${numDrones} equipos).`);
+    valor = maxPermitido;
+  }
+  
+  input.value = valor;
 }
 
-function agregarAlCarrito() {
+function ajustarGeneradores(delta) {
+  const numDrones = parseInt(document.getElementById('cantidad-drones').value);
+  const maxPermitido = numDrones * 2;
+  
+  let input = document.getElementById('cantidad-generadores');
+  let valor = parseInt(input.value) + delta;
+  
+  if (valor < 0) valor = 0;
+  if (valor > maxPermitido) {
+    alert(`El límite máximo permitido es de 2 generadores por dron (${maxPermitido} generadores para ${numDrones} equipos).`);
+    valor = maxPermitido;
+  }
+  
+  input.value = valor;
+}
+
+function ajustarPiezaInd(delta) {
+  let input = document.getElementById('cantidad-piezas-ind');
+  let valor = parseInt(input.value) + delta;
+  if (valor < 1) valor = 1;
+  input.value = valor;
+}
+
+// MANEJO DEL CARRITO
+function agregarDronAlCarrito() {
   if (!productoSeleccionado) return;
 
-  const cantidad = parseInt(document.getElementById('cantidad-drones').value);
-  
+  const numDrones = parseInt(document.getElementById('cantidad-drones').value);
+  const numBat = parseInt(document.getElementById('cantidad-baterias').value);
+  const numGen = parseInt(document.getElementById('cantidad-generadores').value);
+
   const item = {
-    id: productoSeleccionado.id,
+    tipo: 'Combo Dron',
     nombre: productoSeleccionado.nombre,
-    cantidad: cantidad,
-    baterias: cantidad * 3,
-    generadores: cantidad * 1
+    drones: numDrones,
+    baterias: numBat,
+    generadores: numGen
   };
 
   carrito.push(item);
   actualizarBadge();
-  alert(`${nombre} agregado al pedido.`);
+  alert(`Se agregó al pedido: Combo ${productoSeleccionado.nombre}`);
+}
+
+function agregarPiezaIndAlCarrito() {
+  if (!productoSeleccionado) return;
+
+  const cantidad = parseInt(document.getElementById('cantidad-piezas-ind').value);
+
+  const item = {
+    tipo: 'Pieza Individual',
+    nombre: productoSeleccionado.nombre,
+    cantidad: cantidad
+  };
+
+  carrito.push(item);
+  actualizarBadge();
+  alert(`Se agregaron ${cantidad} unidad(es) de ${productoSeleccionado.nombre} al pedido.`);
 }
 
 function actualizarBadge() {
@@ -60,7 +141,11 @@ function abrirModalCarrito() {
 
   let html = '<ul>';
   carrito.forEach((item, index) => {
-    html += `<li><b>${item.nombre}</b> - ${item.cantidad} un. (${item.baterias} Baterías, ${item.generadores} Generadores)</li>`;
+    if (item.tipo === 'Combo Dron') {
+      html += `<li><b>${item.nombre}</b>: ${item.drones} Equipos | ${item.baterias} Baterías | ${item.generadores} Generadores</li>`;
+    } else {
+      html += `<li><b>${item.nombre}</b>: ${item.cantidad} Unidades</li>`;
+    }
   });
   html += '</ul>';
   lista.innerHTML = html;
@@ -82,9 +167,7 @@ function enviarPedidoALark() {
     return;
   }
 
-  // Aquí se conecta con el Webhook de Lark Base
-  console.log("Enviando Pedido:", { cliente, pedido: carrito });
-  
+  console.log("Enviando Pedido a Lark:", { cliente, pedido: carrito });
   alert("¡Pedido enviado a Logística exitosamente!");
   carrito = [];
   actualizarBadge();
