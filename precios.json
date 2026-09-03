@@ -1,0 +1,50 @@
+[
+  {
+    "codigo": "T100",
+    "nombre": "DJI Agras T100",
+    "precio_mxn": 350000.00,
+    "categoria": "dron"
+  },
+  {
+    "codigo": "T70P",
+    "nombre": "DJI Agras T70P",
+    "precio_mxn": 280000.00,
+    "categoria": "dron"
+  },
+  {
+    "codigo": "T55",
+    "nombre": "DJI Agras T55",
+    "precio_mxn": 240000.00,
+    "categoria": "dron"
+  },
+  {
+    "codigo": "T25P",
+    "nombre": "DJI Agras T25P",
+    "precio_mxn": 180000.00,
+    "categoria": "dron"
+  },
+  {
+    "codigo": "BAT-IND",
+    "nombre": "Batería Inteligente DB",
+    "precio_mxn": 22000.00,
+    "categoria": "accesorio"
+  },
+  {
+    "codigo": "GEN-IND",
+    "nombre": "Generador / Cargador EFI C9000",
+    "precio_mxn": 35000.00,
+    "categoria": "accesorio"
+  },
+  {
+    "codigo": "GRAN-IND",
+    "nombre": "Tanque de Granulado",
+    "precio_mxn": 12000.00,
+    "categoria": "accesorio"
+  },
+  {
+    "codigo": "BOQ-IND",
+    "nombre": "Kit de Boquillas",
+    "precio_mxn": 4500.00,
+    "categoria": "accesorio"
+  }
+]
