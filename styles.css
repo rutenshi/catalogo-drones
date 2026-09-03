@@ -50,7 +50,7 @@ body {
 .catalogo-grid {
   flex: 2;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
 
@@ -83,7 +83,7 @@ body {
   cursor: pointer;
 }
 
-/* Panel Lateral */
+/* Panel Lateral y Controles */
 .panel-detalle {
   flex: 1;
   background: white;
@@ -96,7 +96,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 15px 0;
+  margin: 10px 0;
 }
 
 .selector-cantidad button {
@@ -116,11 +116,44 @@ body {
   border: 1px solid #ccc;
 }
 
-.accesorios-sugeridos {
-  background: #eef9f3;
-  padding: 10px;
-  border-left: 4px solid #00a859;
-  margin-bottom: 15px;
+.configuracion-accesorios {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  padding: 12px;
+  border-radius: 6px;
+  margin: 15px 0;
+}
+
+.configuracion-accesorios h4 {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.control-accesorio {
+  margin-bottom: 12px;
+}
+
+.control-accesorio label {
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.selector-cantidad.mini button {
+  width: 28px;
+  height: 28px;
+  font-size: 1rem;
+}
+
+.selector-cantidad.mini input {
+  width: 40px;
+  font-size: 0.95rem;
+}
+
+.texto-maximo {
+  color: #6c757d;
+  font-size: 0.75rem;
+  display: block;
 }
 
 .btn-agregar-carrito {
@@ -149,7 +182,7 @@ body {
   background: white;
   padding: 25px;
   border-radius: 8px;
-  width: 400px;
+  width: 450px;
   max-width: 90%;
 }
 
