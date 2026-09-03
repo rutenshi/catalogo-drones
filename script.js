@@ -1,32 +1,41 @@
-let LISTA_PRECIOS = {};
+let LISTA_PRECIOS = {
+  // Precios de respaldo por si el JSON no ha terminado de cargar
+  'T100': 350000,
+  'T70P': 280000,
+  'T55': 240000,
+  'T25P': 180000,
+  'BAT-IND': 22000,
+  'GEN-IND': 35000,
+  'GRAN-IND': 12000,
+  'BOQ-IND': 4500
+};
+
 let productoSeleccionado = null;
 let carrito = [];
 
-// Formateador oficial a pesos mexicanos (MXN)
+// Formateador de moneda MXN
 function formatearMXN(monto) {
-  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(monto);
+  return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(monto || 0);
 }
 
-// Cargar la lista de precios al inicializar la página desde el JSON
+// Cargar la lista de precios desde el JSON al iniciar
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const respuesta = await fetch('precios.json');
-    if (!respuesta.ok) throw new Error("No se pudo cargar precios.json");
-    
-    const datos = await respuesta.json();
-    
-    // Mapear el arreglo JSON en un diccionario de fácil acceso por código
-    datos.forEach(item => {
-      LISTA_PRECIOS[item.codigo] = item.precio_mxn;
-    });
-
-    // Actualizar precios en las tarjetas visibles
-    actualizarEtiquetasPreciosTarjetas();
-    console.log("Precios cargados correctamente desde precios.json:", LISTA_PRECIOS);
-
+    if (respuesta.ok) {
+      const datos = await respuesta.json();
+      datos.forEach(item => {
+        if (item.codigo && item.precio_mxn) {
+          LISTA_PRECIOS[item.codigo] = parseFloat(item.precio_mxn);
+        }
+      });
+      console.log("Precios cargados desde precios.json:", LISTA_PRECIOS);
+    }
   } catch (error) {
-    console.error("Error al cargar la lista de precios:", error);
+    console.warn("No se pudo cargar precios.json. Usando precios de respaldo.", error);
   }
+
+  actualizarEtiquetasPreciosTarjetas();
 });
 
 function actualizarEtiquetasPreciosTarjetas() {
@@ -34,8 +43,7 @@ function actualizarEtiquetasPreciosTarjetas() {
   codigos.forEach(cod => {
     const el = document.getElementById(`precio-tarjeta-${cod}`);
     if (el) {
-      const precio = LISTA_PRECIOS[cod] || 0;
-      el.innerText = `${formatearMXN(precio)} MXN`;
+      el.innerText = `${formatearMXN(LISTA_PRECIOS[cod])} MXN`;
     }
   });
 }
@@ -43,11 +51,17 @@ function actualizarEtiquetasPreciosTarjetas() {
 function seleccionarProducto(id, nombre, imagen) {
   productoSeleccionado = { id, nombre, imagen };
   
-  document.getElementById('detalle-titulo').innerText = nombre;
-  document.getElementById('detalle-imagen').src = imagen;
-  document.getElementById('controles-dron').style.display = 'block';
+  const elTitulo = document.getElementById('detalle-titulo');
+  const elImagen = document.getElementById('detalle-imagen');
+  const elControles = document.getElementById('controles-dron');
+
+  if (elTitulo) elTitulo.innerText = nombre;
+  if (elImagen) elImagen.src = imagen;
+  if (elControles) elControles.style.display = 'block';
   
-  document.getElementById('cantidad-drones').value = 1;
+  const inputDrones = document.getElementById('cantidad-drones');
+  if (inputDrones) inputDrones.value = 1;
+
   actualizarLimitesAccesorios(1);
 }
 
@@ -57,15 +71,25 @@ function actualizarLimitesAccesorios(numDrones) {
   const maxGranulado = numDrones * 1;
   const maxBoquillas = numDrones * 1;
 
-  document.getElementById('max-bat-label').innerText = maxBaterias;
-  document.getElementById('max-gen-label').innerText = maxGeneradores;
-  document.getElementById('max-gran-label').innerText = maxGranulado;
-  document.getElementById('max-boq-label').innerText = maxBoquillas;
+  const setLabel = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = val;
+  };
 
-  document.getElementById('cantidad-baterias').value = numDrones * 3;
-  document.getElementById('cantidad-generadores').value = numDrones * 1;
-  document.getElementById('cantidad-granulado').value = 0;
-  document.getElementById('cantidad-boquillas').value = 0;
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  };
+
+  setLabel('max-bat-label', maxBaterias);
+  setLabel('max-gen-label', maxGeneradores);
+  setLabel('max-gran-label', maxGranulado);
+  setLabel('max-boq-label', maxBoquillas);
+
+  setVal('cantidad-baterias', numDrones * 3);
+  setVal('cantidad-generadores', numDrones * 1);
+  setVal('cantidad-granulado', 0);
+  setVal('cantidad-boquillas', 0);
 
   calcularTotalCombo();
 }
@@ -73,11 +97,16 @@ function actualizarLimitesAccesorios(numDrones) {
 function calcularTotalCombo() {
   if (!productoSeleccionado) return 0;
 
-  const numDrones = parseInt(document.getElementById('cantidad-drones').value) || 0;
-  const numBat = parseInt(document.getElementById('cantidad-baterias').value) || 0;
-  const numGen = parseInt(document.getElementById('cantidad-generadores').value) || 0;
-  const numGran = parseInt(document.getElementById('cantidad-granulado').value) || 0;
-  const numBoq = parseInt(document.getElementById('cantidad-boquillas').value) || 0;
+  const getVal = (id) => {
+    const el = document.getElementById(id);
+    return el ? (parseInt(el.value) || 0) : 0;
+  };
+
+  const numDrones = getVal('cantidad-drones');
+  const numBat = getVal('cantidad-baterias');
+  const numGen = getVal('cantidad-generadores');
+  const numGran = getVal('cantidad-granulado');
+  const numBoq = getVal('cantidad-boquillas');
 
   const precioDron = LISTA_PRECIOS[productoSeleccionado.id] || 0;
   const precioBat = LISTA_PRECIOS['BAT-IND'] || 0;
@@ -91,23 +120,31 @@ function calcularTotalCombo() {
                 (numGran * precioGran) + 
                 (numBoq * precioBoq);
 
-  document.getElementById('total-combo-monto').innerText = `${formatearMXN(total)} MXN`;
+  const elTotalCombo = document.getElementById('total-combo-monto');
+  if (elTotalCombo) {
+    elTotalCombo.innerText = `${formatearMXN(total)} MXN`;
+  }
+
   return total;
 }
 
 function ajustarDrones(delta) {
   let input = document.getElementById('cantidad-drones');
-  let valor = parseInt(input.value) + delta;
+  if (!input) return;
+  let valor = (parseInt(input.value) || 1) + delta;
   if (valor < 1) valor = 1;
   input.value = valor;
   actualizarLimitesAccesorios(valor);
 }
 
 function ajustarBaterias(delta) {
-  const numDrones = parseInt(document.getElementById('cantidad-drones').value);
+  const inputDrones = document.getElementById('cantidad-drones');
+  const numDrones = inputDrones ? (parseInt(inputDrones.value) || 1) : 1;
   const maxPermitido = numDrones * 6;
+  
   let input = document.getElementById('cantidad-baterias');
-  let valor = parseInt(input.value) + delta;
+  if (!input) return;
+  let valor = (parseInt(input.value) || 0) + delta;
   
   if (valor < 0) valor = 0;
   if (valor > maxPermitido) {
@@ -119,10 +156,13 @@ function ajustarBaterias(delta) {
 }
 
 function ajustarGeneradores(delta) {
-  const numDrones = parseInt(document.getElementById('cantidad-drones').value);
+  const inputDrones = document.getElementById('cantidad-drones');
+  const numDrones = inputDrones ? (parseInt(inputDrones.value) || 1) : 1;
   const maxPermitido = numDrones * 2;
+  
   let input = document.getElementById('cantidad-generadores');
-  let valor = parseInt(input.value) + delta;
+  if (!input) return;
+  let valor = (parseInt(input.value) || 0) + delta;
   
   if (valor < 0) valor = 0;
   if (valor > maxPermitido) {
@@ -134,10 +174,13 @@ function ajustarGeneradores(delta) {
 }
 
 function ajustarGranulado(delta) {
-  const numDrones = parseInt(document.getElementById('cantidad-drones').value);
+  const inputDrones = document.getElementById('cantidad-drones');
+  const numDrones = inputDrones ? (parseInt(inputDrones.value) || 1) : 1;
   const maxPermitido = numDrones * 1;
+  
   let input = document.getElementById('cantidad-granulado');
-  let valor = parseInt(input.value) + delta;
+  if (!input) return;
+  let valor = (parseInt(input.value) || 0) + delta;
   
   if (valor < 0) valor = 0;
   if (valor > maxPermitido) {
@@ -149,10 +192,13 @@ function ajustarGranulado(delta) {
 }
 
 function ajustarBoquillas(delta) {
-  const numDrones = parseInt(document.getElementById('cantidad-drones').value);
+  const inputDrones = document.getElementById('cantidad-drones');
+  const numDrones = inputDrones ? (parseInt(inputDrones.value) || 1) : 1;
   const maxPermitido = numDrones * 1;
+  
   let input = document.getElementById('cantidad-boquillas');
-  let valor = parseInt(input.value) + delta;
+  if (!input) return;
+  let valor = (parseInt(input.value) || 0) + delta;
   
   if (valor < 0) valor = 0;
   if (valor > maxPermitido) {
@@ -164,13 +210,21 @@ function ajustarBoquillas(delta) {
 }
 
 function agregarDronAlCarrito() {
-  if (!productoSeleccionado) return;
+  if (!productoSeleccionado) {
+    alert("Por favor selecciona un modelo de dron antes de agregar al pedido.");
+    return;
+  }
 
-  const numDrones = parseInt(document.getElementById('cantidad-drones').value);
-  const numBat = parseInt(document.getElementById('cantidad-baterias').value);
-  const numGen = parseInt(document.getElementById('cantidad-generadores').value);
-  const numGran = parseInt(document.getElementById('cantidad-granulado').value);
-  const numBoq = parseInt(document.getElementById('cantidad-boquillas').value);
+  const getVal = (id) => {
+    const el = document.getElementById(id);
+    return el ? (parseInt(el.value) || 0) : 0;
+  };
+
+  const numDrones = getVal('cantidad-drones') || 1;
+  const numBat = getVal('cantidad-baterias');
+  const numGen = getVal('cantidad-generadores');
+  const numGran = getVal('cantidad-granulado');
+  const numBoq = getVal('cantidad-boquillas');
   const subtotal = calcularTotalCombo();
 
   const item = {
@@ -186,42 +240,64 @@ function agregarDronAlCarrito() {
 
   carrito.push(item);
   actualizarBadge();
-  alert(`Se agregó al pedido: ${productoSeleccionado.nombre}`);
+  alert(`Se agregó al pedido: ${numDrones}x ${productoSeleccionado.nombre}`);
 }
 
 function actualizarBadge() {
-  document.getElementById('badge-contador').innerText = carrito.length;
+  const elBadge = document.getElementById('badge-contador');
+  if (elBadge) {
+    elBadge.innerText = carrito.length;
+  }
 }
 
 function abrirModalCarrito() {
   const modal = document.getElementById('modal-carrito');
   const lista = document.getElementById('lista-carrito');
-  modal.style.display = 'flex';
+  if (modal) modal.style.display = 'flex';
+
+  if (!lista) return;
 
   if (carrito.length === 0) {
     lista.innerHTML = '<p>El pedido está vacío.</p>';
-    document.getElementById('total-general-monto').innerText = "$0.00 MXN";
+    const elTotal = document.getElementById('total-general-monto');
+    if (elTotal) elTotal.innerText = "$0.00 MXN";
     return;
   }
 
-  let html = '<ul>';
+  let html = '<ul style="list-style:none; padding:0;">';
   let totalGeneral = 0;
 
-  carrito.forEach((item) => {
+  carrito.forEach((item, index) => {
     totalGeneral += item.subtotal;
-    html += `<li><b>${item.nombre}</b>: ${item.drones} Equipos | ${item.baterias} Bat. | ${item.generadores} Gen. | ${item.granulado} Gran. | ${item.boquillas} Boq.<br><small>Subtotal: <b>${formatearMXN(item.subtotal)} MXN</b></small></li>`;
+    html += `
+      <li style="border-bottom: 1px solid #ddd; padding: 8px 0;">
+        <b>${item.nombre}</b>: ${item.drones} Equipos | ${item.baterias} Bat. | ${item.generadores} Gen. | ${item.granulado} Gran. | ${item.boquillas} Boq.<br>
+        <small>Subtotal: <b>${formatearMXN(item.subtotal)} MXN</b></small>
+        <button onclick="eliminarItemCarrito(${index})" style="margin-left: 10px; color: red; border: none; background: none; cursor: pointer;">[Eliminar]</button>
+      </li>`;
   });
   html += '</ul>';
   lista.innerHTML = html;
-  document.getElementById('total-general-monto').innerText = `${formatearMXN(totalGeneral)} MXN`;
+
+  const elTotal = document.getElementById('total-general-monto');
+  if (elTotal) elTotal.innerText = `${formatearMXN(totalGeneral)} MXN`;
+}
+
+function eliminarItemCarrito(index) {
+  carrito.splice(index, 1);
+  actualizarBadge();
+  abrirModalCarrito();
 }
 
 function cerrarModalCarrito() {
-  document.getElementById('modal-carrito').style.display = 'none';
+  const modal = document.getElementById('modal-carrito');
+  if (modal) modal.style.display = 'none';
 }
 
 function enviarPedidoALark() {
-  const cliente = document.getElementById('nombre-cliente').value;
+  const elCliente = document.getElementById('nombre-cliente');
+  const cliente = elCliente ? elCliente.value.trim() : '';
+  
   if (!cliente) {
     alert("Por favor ingresa el nombre del distribuidor.");
     return;
@@ -232,7 +308,7 @@ function enviarPedidoALark() {
     return;
   }
 
-  console.log("Enviando Pedido a Lark:", { cliente, pedido: carrito });
+  console.log("Enviando Pedido a Logística:", { cliente, pedido: carrito });
   alert("¡Pedido enviado a Logística exitosamente!");
   carrito = [];
   actualizarBadge();
